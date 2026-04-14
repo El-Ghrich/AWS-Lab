@@ -93,7 +93,7 @@ resource "aws_security_group" "web_sg" {
 # ------------------------------------------------------
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-0c7217cdde317cfec" # Ubuntu 22.04 LTS
+  ami           = "ami-098e39bafa7e7303d" # Ubuntu 22.04 LTS
   instance_type = "t2.micro"
   
   # On attache tout ce qu'on a créé au-dessus :
