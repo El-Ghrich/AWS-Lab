@@ -95,7 +95,6 @@ resource "aws_security_group" "web_sg" {
 resource "aws_instance" "app_server" {
   ami           = "ami-098e39bafa7e7303d" # Ubuntu 22.04 LTS
   instance_type = "t2.micro"
-  
   # On attache tout ce qu'on a créé au-dessus :
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
