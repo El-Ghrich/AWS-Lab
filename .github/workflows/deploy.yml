@@ -1,0 +1,45 @@
+name: Deploy to AWS with Terraform & Ansible
+
+on:
+  push:
+    branches:
+      - main  # Le déploiement se lance quand tu push sur main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init & Apply
+        working-directory: ./terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve
+          echo "INSTANCE_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
+
+      # 3. Préparer SSH pour Ansible
+      - name: Setup SSH for Ansible
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.INSTANCE_IP }} >> ~/.ssh/known_hosts
+
+      # 4. Installer Ansible et exécuter le Playbook
+      - name: Run Ansible Playbook
+        run: |
+          sudo apt-get update && sudo apt-get install -y ansible
+          ansible-playbook -i "${{ env.INSTANCE_IP }}," -u ubuntu --private-key ~/.ssh/id_rsa ./ansible/deploy.yml
