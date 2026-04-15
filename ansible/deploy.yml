@@ -9,11 +9,9 @@
         state: latest
         update_cache: yes
 
-    - name: Installer Docker et le plugin Docker Compose
+    - name: Installer Docker
       dnf:
-        name: 
-          - docker
-          - docker-compose-plugin
+        name: docker
         state: present
 
     - name: Démarrer le service Docker
@@ -28,8 +26,20 @@
         groups: docker
         append: yes
 
-    # --- NOUVELLES ÉTAPES ---
-    
+    # --- INSTALLATION DE DOCKER COMPOSE V2 MANUELLE ---
+    - name: Créer le dossier pour le plugin Docker Compose
+      file:
+        path: /usr/libexec/docker/cli-plugins
+        state: directory
+        mode: '0755'
+
+    - name: Télécharger Docker Compose V2 depuis GitHub
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+        dest: /usr/libexec/docker/cli-plugins/docker-compose
+        mode: '0755' # Rend le fichier exécutable
+
+    # --- DÉPLOIEMENT DE TON APPLICATION ---
     - name: Créer le dossier de l'application
       file:
         path: /home/ec2-user/app
@@ -39,21 +49,19 @@
 
     - name: Copier le fichier docker-compose.yml
       copy:
-        src: ./docker-compose.yml # Ce fichier doit être dans le même dossier que ce playbook sur GitHub
+        src: ./docker-compose.yml
         dest: /home/ec2-user/app/docker-compose.yml
 
     - name: Créer le fichier .env pour le backend
       copy:
         dest: /home/ec2-user/app/.env.backend
         content: |
-          # Ajoute tes variables secrètes ici plus tard
           DB_CONNECTION_STRING=Host=postgres;Port=5432;Database=cv_db;Username=postgres;Password=postgres
 
     - name: Créer le fichier .env pour l'AI
       copy:
         dest: /home/ec2-user/app/.env.ai
         content: |
-          # Ajoute tes variables secrètes ici plus tard
           OPENAI_API_KEY=ta_cle_secrete
 
     - name: Lancer Docker Compose
