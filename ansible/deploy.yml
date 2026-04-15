@@ -1,44 +1,33 @@
 ---
-- name: Installation de Docker et Nginx
+- name: Installation de Docker et Nginx sur Amazon Linux
   hosts: all
   become: yes
   tasks:
-    - name: Mise à jour de apt
-      apt:
+    - name: Mettre à jour les paquets (DNF)
+      dnf:
+        name: "*"
+        state: latest
         update_cache: yes
-        force_apt_get: yes
 
-    - name: Installation des paquets requis
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-          - python3-pip
-        state: present
-
-    - name: Ajout de la clé GPG Docker
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Ajout du dépôt Docker
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
-        state: present
-
-    - name: Installation de Docker Engine
-      apt:
-        name: docker-ce
-        state: present
-
-    - name: Installation du module Python Docker (nécessaire pour Ansible)
-      pip:
+    - name: Installer Docker
+      dnf:
         name: docker
+        state: present
+
+    - name: Démarrer le service Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Ajouter l'utilisateur au groupe docker
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
 
     - name: Lancement du conteneur Nginx
-      docker_container:
+      community.docker.docker_container:
         name: mon-serveur-web
         image: nginx:latest
         state: started
