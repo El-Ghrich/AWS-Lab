@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket         = "mon-terraform-state-salman" # Le nom exact créé à l'étape 1
+    key            = "global/s3/terraform.tfstate"     # Chemin du fichier dans le bucket
+    region         = "us-east-1"                       # Ta région
+    encrypt        = true                              # Chiffre le state au repos
+  }
+}
 provider "aws" {
   region = "us-east-1"
 }
