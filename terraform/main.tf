@@ -102,7 +102,6 @@ resource "aws_instance" "app_server" {
 
   tags = { Name = "Docker-Ansible-Host" }
 }
-
 # On affiche l'IP pour GitHub Actions
 output "instance_public_ip" {
   value = aws_instance.app_server.public_ip
