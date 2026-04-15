@@ -3,7 +3,7 @@ name: Deploy to AWS with Terraform & Ansible
 on:
   push:
     branches:
-      - main  # Le déploiement se lance quand tu push sur main
+      - main 
 
 jobs:
   deploy:
