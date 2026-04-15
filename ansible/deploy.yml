@@ -1,5 +1,5 @@
 ---
-- name: Installation de Docker et Nginx sur Amazon Linux
+- name: Déploiement de l'application Microservices
   hosts: all
   become: yes
   tasks:
@@ -9,9 +9,11 @@
         state: latest
         update_cache: yes
 
-    - name: Installer Docker
+    - name: Installer Docker et le plugin Docker Compose
       dnf:
-        name: docker
+        name: 
+          - docker
+          - docker-compose-plugin
         state: present
 
     - name: Démarrer le service Docker
@@ -26,11 +28,35 @@
         groups: docker
         append: yes
 
-    - name: Lancement du conteneur Nginx
-      community.docker.docker_container:
-        name: mon-serveur-web
-        image: nginx:latest
-        state: started
-        restart_policy: always
-        published_ports:
-          - "80:80"
+    # --- NOUVELLES ÉTAPES ---
+    
+    - name: Créer le dossier de l'application
+      file:
+        path: /home/ec2-user/app
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Copier le fichier docker-compose.yml
+      copy:
+        src: ./docker-compose.yml # Ce fichier doit être dans le même dossier que ce playbook sur GitHub
+        dest: /home/ec2-user/app/docker-compose.yml
+
+    - name: Créer le fichier .env pour le backend
+      copy:
+        dest: /home/ec2-user/app/.env.backend
+        content: |
+          # Ajoute tes variables secrètes ici plus tard
+          DB_CONNECTION_STRING=Host=postgres;Port=5432;Database=cv_db;Username=postgres;Password=postgres
+
+    - name: Créer le fichier .env pour l'AI
+      copy:
+        dest: /home/ec2-user/app/.env.ai
+        content: |
+          # Ajoute tes variables secrètes ici plus tard
+          OPENAI_API_KEY=ta_cle_secrete
+
+    - name: Lancer Docker Compose
+      command: docker compose up -d
+      args:
+        chdir: /home/ec2-user/app

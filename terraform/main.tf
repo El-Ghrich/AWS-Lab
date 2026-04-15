@@ -81,9 +81,33 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"] 
   }
 
+ ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Frontend Angular
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 4200
+    to_port     = 4200
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Backend .NET
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # AI Agents FastAPI
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
