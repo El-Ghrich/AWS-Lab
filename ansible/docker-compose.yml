@@ -2,25 +2,25 @@ name: cv-app
 
 services:
   # ---------- Keycloak ----------
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: cv-keycloak
-    command: start-dev
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/cv_db
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: postgres
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - cv-network
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:latest
+  #   container_name: cv-keycloak
+  #   command: start-dev
+  #   environment:
+  #     KEYCLOAK_ADMIN: admin
+  #     KEYCLOAK_ADMIN_PASSWORD: admin
+  #     KC_DB: postgres
+  #     KC_DB_URL: jdbc:postgresql://postgres:5432/cv_db
+  #     KC_DB_USERNAME: postgres
+  #     KC_DB_PASSWORD: postgres
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - cv-network
 
   # ---------- PostgreSQL ----------
   postgres:
@@ -48,7 +48,7 @@ services:
     image: salmanelghrich/cv-backend:latest
     container_name: cv-backend
     ports:
-      - "5000:80" 
+      - "5000:80"
     env_file:
       - .env.backend
     environment:
@@ -61,31 +61,31 @@ services:
       - cv-network
 
   # ---------- AI Agents (FastAPI) ----------
-  ai_agents:
-    image: salmanelghrich/cv-ai-agents:latest
-    container_name: cv-ai-agents
-    ports:
-      - "8000:8000"
-    restart: unless-stopped
-    env_file:
-      - .env.ai
-    depends_on:
-      - backend
-    networks:
-      - cv-network
+  # ai_agents:
+  #   image: salmanelghrich/cv-ai-agents:latest
+  #   container_name: cv-ai-agents
+  #   ports:
+  #     - "8000:8000"
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env.ai
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - cv-network
 
-  # ---------- Frontend (Angular + Nginx) ----------
-  frontend:
-    image: salmanelghrich/cv-frontend:latest
-    container_name: cv-frontend
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
-      - ai_agents
-    restart: unless-stopped
-    networks:
-      - cv-network
+  # # ---------- Frontend (Angular + Nginx) ----------
+  # frontend:
+  #   image: salmanelghrich/cv-frontend:latest
+  #   container_name: cv-frontend
+  #   ports:
+  #     - "4200:80"
+  #   depends_on:
+  #     - backend
+  #     - ai_agents
+  #   restart: unless-stopped
+  #   networks:
+  #     - cv-network
 
 volumes:
   pgdata:
